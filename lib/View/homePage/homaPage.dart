@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:quran_kareem/View/homePage/card.dart';
-import 'package:quran_kareem/View/homePage/para_page/para.dart';
-import 'package:quran_kareem/View/homePage/video_page/quran_translation.dart';
 import 'package:quran_kareem/View/homePage/video_page/quran_video.dart';
 import 'package:quran_kareem/View/prayer_page/prayer_page.dart';
 import 'package:quran_kareem/View/qibla_page/qibla.dart';

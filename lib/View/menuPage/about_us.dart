@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:quran_kareem/utils/appcolors.dart';
 
@@ -116,6 +115,7 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
+  // ignore: unused_element
   Widget _buildContactTile(IconData icon, String title, String subtitle) {
     return ListTile(
       leading: Icon(icon, color: AppColors.primary, size: 30),

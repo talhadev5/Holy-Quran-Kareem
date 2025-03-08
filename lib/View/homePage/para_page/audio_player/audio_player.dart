@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -151,6 +153,7 @@ class _SurahDetailScreenState extends State<SurahDetailScreen>
       }
 
       final audioUrl = await quran.getAudioURLBySurah(parahIndex);
+      // ignore: unnecessary_null_comparison
       if (audioUrl == null || audioUrl.isEmpty) {
         throw Exception("Invalid audio URL");
       }
@@ -216,38 +219,7 @@ class _SurahDetailScreenState extends State<SurahDetailScreen>
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
-            // Expanded(
-            //   child: ListView.builder(
-            //     controller: _scrollController,
-            //     itemCount: arabicText.length,
-            //     itemBuilder: (context, index) {
-            //       return AnimatedContainer(
-            //         duration: Duration(milliseconds: 00),
-            //         padding: const EdgeInsets.all(15),
-            //         margin: const EdgeInsets.symmetric(vertical: 5),
-            //         decoration: BoxDecoration(
-            //           color: index == currentAyah
-            //               // ignore: deprecated_member_use
-            //               ? AppColors.primary.withOpacity(0.3)
-            //               : Colors.transparent,
-            //           borderRadius: BorderRadius.circular(10),
-            //         ),
-            //         child: Text(
-            //           arabicText[index],
-            //           textAlign: TextAlign.center,
-            //           style: TextStyle(
-            //             fontSize: 28,
-            //             fontWeight: FontWeight.w500,
-            //             color: index == currentAyah
-            //                 ? AppColors.primary
-            //                 : Colors.black,
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
-            Expanded(
+           Expanded(
               child: ListView.builder(
                 controller: _scrollController,
                 itemCount: arabicText.length,

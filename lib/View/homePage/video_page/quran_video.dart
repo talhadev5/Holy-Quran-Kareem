@@ -15,7 +15,6 @@ class QuranVideoPage extends StatefulWidget {
 
 class _QuranVideoPageState extends State<QuranVideoPage> {
   late YoutubePlayerController _controller;
-  late PlayerState _playerState;
   late YoutubeMetaData _videoMetaData;
   bool _isPlayerReady = false;
   bool _muted = false;
@@ -71,14 +70,12 @@ class _QuranVideoPageState extends State<QuranVideoPage> {
       ),
     )..addListener(_listener);
 
-    _playerState = PlayerState.unknown;
     _videoMetaData = const YoutubeMetaData();
   }
 
   void _listener() {
     if (_isPlayerReady && mounted) {
       setState(() {
-        _playerState = _controller.value.playerState;
         _videoMetaData = _controller.metadata;
       });
     }

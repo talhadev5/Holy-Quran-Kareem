@@ -3,13 +3,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:quran_kareem/View/menuPage/about_us.dart';
 import 'package:quran_kareem/View/menuPage/faqs.dart';
+import 'package:quran_kareem/controllers/add_controller.dart';
 import 'package:quran_kareem/utils/appcolors.dart';
 import 'package:share_plus/share_plus.dart';
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
+
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
+  final controller = Get.put(MyAdController());
+  @override
+  void initState() {
+    controller.loadAllAds();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,50 +33,70 @@ class MenuPage extends StatelessWidget {
     ));
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 60),
-        child: Column(
-          children: [
-            // ✅ App Icon
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.green.shade100,
-              backgroundImage: AssetImage('assets/applogo.jpg'),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 60),
+            child: Column(
+              children: [
+                // ✅ App Icon
+                CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.green.shade100,
+                  backgroundImage: AssetImage('assets/applogo.jpg'),
+                ),
+                const SizedBox(height: 10),
+                // ✅ App Title
+                const Text(
+                  "Holy Quran Majeed",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // ✅ Menu Options
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    children: [
+                      _buildMenuItem(Icons.info_outline, "About Us", () {
+                        Get.to(() => AboutUsPage());
+                      }),
+                      _buildMenuItem(Icons.help_outline, "FAQs", () {
+                        Get.to(() => FAQSPage());
+                      }),
+                      // _buildMenuItem(Icons.grid_view, "Terms & Conditions", () {
+                      //   Get.to(() => TermsConditionPage());
+                      // }),
+                      _buildMenuItem(Icons.share, "Share App", () {
+                        Share.share(
+                            "Check out this amazing Quran Kareem App: https://play.google.com/store/apps/details?id=com.yourapp.qurankareem");
+                      }),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            // ✅ App Title
-            const Text(
-              "Holy Quran Majeed",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: GetBuilder<MyAdController>(
+              builder: (controller) {
+                if (controller.bannerAd != null) {
+                  return Container(
+                    color: Colors.white,
+                    width: controller.bannerAd!.size.width.toDouble(),
+                    height: controller.bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: controller.bannerAd!),
+                  );
+                }
+                return SizedBox.shrink();
+              },
             ),
-            const SizedBox(height: 20),
-            // ✅ Menu Options
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _buildMenuItem(Icons.info_outline, "About Us", () {
-                    Get.to(() => AboutUsPage());
-                  }),
-                  _buildMenuItem(Icons.help_outline, "FAQs", () {
-                    Get.to(() => FAQSPage());
-                  }),
-                  // _buildMenuItem(Icons.grid_view, "Terms & Conditions", () {
-                  //   Get.to(() => TermsConditionPage());
-                  // }),
-                  _buildMenuItem(Icons.share, "Share App", () {
-                    Share.share(
-                        "Check out this amazing Quran Kareem App: https://play.google.com/store/apps/details?id=com.yourapp.qurankareem");
-                  }),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -7,11 +7,16 @@ import 'package:quran_kareem/View/homePage/para_page/surah_page.dart';
 import 'package:quran_kareem/View/menuPage/menuPage.dart';
 import 'package:quran_kareem/View/prayer_page/prayer_page.dart';
 import 'package:quran_kareem/View/qibla_page/qibla.dart';
+import 'package:quran_kareem/controllers/add_controller.dart';
 import 'package:quran_kareem/utils/appcolors.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+
+  Get.put(MyAdController());
 
   // Change the status bar color
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

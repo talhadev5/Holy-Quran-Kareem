@@ -5,6 +5,9 @@ import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:quran_kareem/controllers/add_controller.dart';
 import 'package:quran_kareem/utils/appcolors.dart';
 import 'package:quran_kareem/widget/location_error.dart';
 
@@ -31,9 +34,12 @@ class _QiblahCompassState extends State<QiblahCompass> {
     }
   }
 
+  MyAdController controller = Get.put(MyAdController());
+
   @override
   void initState() {
     _checkLocationStatus();
+    controller.loadBannerAd();
     super.initState();
   }
 
@@ -61,52 +67,72 @@ class _QiblahCompassState extends State<QiblahCompass> {
         centerTitle: true,
         iconTheme: IconThemeData(color: AppColors.whitColor),
       ),
-      body: Container(
-        decoration: BoxDecoration(color: AppColors.whitColor),
-        child: StreamBuilder(
-          stream: stream,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: SpinKitFadingCircle(
-                  color: AppColors.primary,
-                  size: 50.0,
-                ),
-              );
-            }
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(color: AppColors.whitColor),
+            child: StreamBuilder(
+              stream: stream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: SpinKitFadingCircle(
+                      color: AppColors.primary,
+                      size: 50.0,
+                    ),
+                  );
+                }
 
-            final LocationStatus? locationStatus =
-                snapshot.data as LocationStatus?;
+                final LocationStatus? locationStatus =
+                    snapshot.data as LocationStatus?;
 
-            if (locationStatus?.enabled == true) {
-              switch (locationStatus?.status) {
-                case LocationPermission.always:
-                case LocationPermission.whileInUse:
-                  return const QiblahCompassWidget();
+                if (locationStatus?.enabled == true) {
+                  switch (locationStatus?.status) {
+                    case LocationPermission.always:
+                    case LocationPermission.whileInUse:
+                      return const QiblahCompassWidget();
 
-                case LocationPermission.denied:
+                    case LocationPermission.denied:
+                      return LocationErrorWidget(
+                        error: "Location service permission denied",
+                        callback: _checkLocationStatus,
+                      );
+
+                    case LocationPermission.deniedForever:
+                      return LocationErrorWidget(
+                        error: "Location service Denied Forever!",
+                        callback: _checkLocationStatus,
+                      );
+
+                    default:
+                      return Container();
+                  }
+                } else {
                   return LocationErrorWidget(
-                    error: "Location service permission denied",
+                    error: "Please enable Location service",
                     callback: _checkLocationStatus,
                   );
-
-                case LocationPermission.deniedForever:
-                  return LocationErrorWidget(
-                    error: "Location service Denied Forever!",
-                    callback: _checkLocationStatus,
+                }
+              },
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: GetBuilder<MyAdController>(
+              builder: (controller) {
+                if (controller.bannerAd != null) {
+                  return Container(
+                    color: Colors.white,
+                    width: controller.bannerAd!.size.width.toDouble(),
+                    height: controller.bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: controller.bannerAd!),
                   );
-
-                default:
-                  return Container();
-              }
-            } else {
-              return LocationErrorWidget(
-                error: "Please enable Location service",
-                callback: _checkLocationStatus,
-              );
-            }
-          },
-        ),
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -183,22 +209,6 @@ class QiblahCompassWidget extends StatelessWidget {
               ),
 
               // const SizedBox(height: 30),
-
-              // Text(
-              //   "${qiblahDirection.qiblah.toStringAsFixed(2)}° Offset",
-              //   style: TextStyle(
-              //     fontSize: 20,
-              //     fontWeight: FontWeight.w600,
-              //     color: AppColors.primary,
-              // shadows: [
-              //   Shadow(
-              //     blurRadius: 10,
-              //     color: AppColors.primary.withValues(alpha: 0.5),
-              //     // offset: Offset(2, 2),
-              //   ),
-              // ],
-              //   ),
-              // ),
             ],
           ),
         );

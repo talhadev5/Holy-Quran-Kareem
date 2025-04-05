@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:quran_kareem/View/homePage/card.dart';
+import 'package:quran_kareem/View/homePage/para_page/surah_page.dart';
 import 'package:quran_kareem/View/homePage/video_page/quran_video.dart';
 import 'package:quran_kareem/View/navBar.dart';
 import 'package:quran_kareem/View/prayer_page/prayer_page.dart';
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    controller.loadAllAds();
+    controller.loadNativeAd();
   }
 
   @override
@@ -34,11 +35,12 @@ class _HomePageState extends State<HomePage> {
       statusBarColor: AppColors.primary, // Set your preferred color
       statusBarIconBrightness: Brightness.light,
     ));
-    return Scaffold(
-      backgroundColor: AppColors.whitColor,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Scaffold(
+          backgroundColor: AppColors.whitColor,
+          body: SingleChildScrollView(
             child: Column(
               children: [
                 // 🔹 Display Banner Ad Here
@@ -82,24 +84,18 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GetBuilder<MyAdController>(
-              builder: (controller) {
-                if (controller.bannerAd != null) {
-                  return Container(
-                    color: Colors.white,
-                    width: controller.bannerAd!.size.width.toDouble(),
-                    height: controller.bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: controller.bannerAd!),
-                  );
-                }
-                return SizedBox.shrink();
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+        Obx(() => Container(
+              child: controller.isAdLoaded.value
+                  ? ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 100,
+                        minHeight: 100,
+                      ),
+                      child: AdWidget(ad: controller.nativeAd!))
+                  : const SizedBox(),
+            )),
+      ],
     );
   }
 }
@@ -125,7 +121,7 @@ void navigateWithInterstitialAd(Widget page) {
     adController.interstitialAd!.show();
     adController.interstitialAd = null;
   } else {
-    Get.to(() => page);
+    Get.to(() => MainNavigationPage());
   }
 }
 
@@ -134,33 +130,32 @@ final List<Map<String, dynamic>> featureItems = [
   {
     "title": "Quran Audio",
     "image": 'assets/icon 1.svg',
-    "onTap": () {
-      Get.toNamed('/paraPage');
-    }
+    "onTap": () => navigateWithInterstitialAd(SurahListScreen()),
+    // "onTap": () {
+    //   Get.toNamed('/paraPage');
+    // }
   },
   {
     "title": "Quran Video",
     "image": 'assets/icon 2.svg',
-    "onTap": () {
-      Get.to(() => QuranVideoPage());
-    }
+    "onTap": () => navigateWithInterstitialAd(QuranVideoPage()),
+    // {
+    //   Get.to(() => QuranVideoPage());
+    // }
   },
   {
     "title": "Prayer Time",
     "image": 'assets/icon 3.svg',
-    "onTap": () => navigateWithInterstitialAd(PrayerPage()),
-    // "onTap": () {
-    //   // Get.to(() => PrayerPage());
-
-    // }
+    "onTap": () {
+      Get.to(() => PrayerPage());
+    }
   },
   {
     "title": "Qibla Direction",
     "image": 'assets/icon 4.svg',
-    "onTap": () => navigateWithInterstitialAd(QiblahCompass()),
-    // "onTap": () {
-    //   Get.to(() => QiblahCompass());
-    // }
+    "onTap": () {
+      Get.to(() => QiblahCompass());
+    }
   },
   {
     "title": "Rate Us",

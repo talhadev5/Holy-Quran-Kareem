@@ -1,16 +1,18 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MyAdController extends GetxController {
   // Replace these with actual Ad Unit IDs from AdMob
-  final String bannerAdUnit = 'ca-app-pub-3940256099942544/6300978111';
-  final String interstitialAdUnit = 'ca-app-pub-3940256099942544/1033173712';
-  final String rewardedAdUnit = 'ca-app-pub-3940256099942544/5224354917';
+  final String bannerAdUnit = 'ca-app-pub-2818463232907910/5618149997';
+  final String interstitialAdUnit = 'ca-app-pub-2818463232907910/5945088091';
+  final String rewardedAdUnit = 'ca-app-pub-2818463232907910/1323316801';
   final String rewardedInterstitialAdUnit =
-      'ca-app-pub-2818463232907910/5522308465';
-  final String nativeAdUnit = 'ca-app-pub-2818463232907910/5522308465';
-  final String appOpenAdUnit = 'ca-app-pub-2a818463232907910/5522308465';
+      'ca-app-pub-2818463232907910/2594501026';
+  final String nativeAdUnit = 'ca-app-pub-2818463232907910/1323316801';
+  final String appOpenAdUnit = 'ca-app-pub-2818463232907910/2007311698';
 
   BannerAd? bannerAd;
   InterstitialAd? interstitialAd;
@@ -20,7 +22,7 @@ class MyAdController extends GetxController {
   AppOpenAd? appOpenAd;
   bool hasShownInitialAd = false;
 
-  bool isAppOpenAdLoaded = false;
+  bool isAppOpenAdLoaded = false; // Track if App Open Ad is loaded
 
   @override
   void onInit() {
@@ -46,9 +48,9 @@ class MyAdController extends GetxController {
       size: AdSize.banner,
       request: AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (_) => debugPrint("✅ Banner Ad Loaded"),
+        onAdLoaded: (_) => debugPrint(" Banner Ad Loaded"),
         onAdFailedToLoad: (ad, error) {
-          debugPrint("❌ Banner Ad Failed: $error");
+          debugPrint(" Banner Ad Failed: $error");
           ad.dispose();
         },
       ),
@@ -63,27 +65,9 @@ class MyAdController extends GetxController {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) => interstitialAd = ad,
         onAdFailedToLoad: (error) =>
-            debugPrint("❌ Interstitial Ad Failed: $error"),
+            debugPrint(" Interstitial Ad Failed: $error"),
       ),
     );
-  }
-
-  void showInitialInterstitialAdIfAvailable() {
-    if (!hasShownInitialAd && interstitialAd != null) {
-      interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          ad.dispose();
-          loadInterstitialAd(); // Reload the ad after dismissal
-        },
-        onAdFailedToShowFullScreenContent: (ad, error) {
-          ad.dispose();
-          loadInterstitialAd(); // Reload the ad on failure
-        },
-      );
-      interstitialAd!.show();
-      interstitialAd = null;
-      hasShownInitialAd = true;
-    }
   }
 
   // 🔹 Show Interstitial Ad
@@ -93,7 +77,7 @@ class MyAdController extends GetxController {
       interstitialAd = null;
       loadInterstitialAd(); // Reload for next use
     } else {
-      debugPrint("⚠️ Interstitial Ad Not Loaded");
+      debugPrint(" Interstitial Ad Not Loaded");
     }
   }
 
@@ -104,7 +88,7 @@ class MyAdController extends GetxController {
       request: AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) => rewardedAd = ad,
-        onAdFailedToLoad: (error) => debugPrint("❌ Rewarded Ad Failed: $error"),
+        onAdFailedToLoad: (error) => debugPrint(" Rewarded Ad Failed: $error"),
       ),
     );
   }
@@ -120,7 +104,7 @@ class MyAdController extends GetxController {
       rewardedAd = null;
       loadRewardedAd(); // Reload for next use
     } else {
-      debugPrint("⚠️ Rewarded Ad Not Loaded");
+      debugPrint("Rewarded Ad Not Loaded");
     }
   }
 
@@ -132,7 +116,7 @@ class MyAdController extends GetxController {
       rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
         onAdLoaded: (ad) => rewardedInterstitialAd = ad,
         onAdFailedToLoad: (error) =>
-            debugPrint("❌ Rewarded Interstitial Ad Failed: $error"),
+            debugPrint(" Rewarded Interstitial Ad Failed: $error"),
       ),
     );
   }
@@ -142,34 +126,40 @@ class MyAdController extends GetxController {
     if (rewardedInterstitialAd != null) {
       rewardedInterstitialAd!.show(
         onUserEarnedReward: (ad, reward) {
-          debugPrint("🎉 User earned reward: ${reward.amount}");
+          debugPrint("User earned reward: ${reward.amount}");
         },
       );
       rewardedInterstitialAd = null;
       loadRewardedInterstitialAd();
     } else {
-      debugPrint("⚠️ Rewarded Interstitial Ad Not Loaded");
+      debugPrint(" Rewarded Interstitial Ad Not Loaded");
     }
   }
+
+  RxBool isAdLoaded = false.obs;
 
   // 🔹 Load Native Ad
   void loadNativeAd() {
     nativeAd = NativeAd(
-      adUnitId: nativeAdUnit,
-      factoryId: 'listTile', // Ensure this is registered in Android/iOS
-      request: AdRequest(),
-      listener: NativeAdListener(
-        onAdLoaded: (_) => debugPrint("✅ Native Ad Loaded"),
-        onAdFailedToLoad: (ad, error) {
-          debugPrint("❌ Native Ad Failed: $error");
-          ad.dispose();
-        },
-      ),
-    )..load();
+        adUnitId: nativeAdUnit,
+        factoryId: 'video',
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            isAdLoaded.value = true;
+            log("Ad Loaded");
+          },
+          onAdFailedToLoad: (ad, error) {
+            isAdLoaded.value = false;
+          },
+        ),
+        request: const AdRequest(),
+        nativeTemplateStyle:
+            NativeTemplateStyle(templateType: TemplateType.small));
+    nativeAd!.load();
   }
 
   // 🔹 Load App Open Ad
-  void loadAppOpenAd() {
+  loadAppOpenAd() {
     AppOpenAd.load(
       adUnitId: appOpenAdUnit,
       request: AdRequest(),
@@ -178,7 +168,7 @@ class MyAdController extends GetxController {
           appOpenAd = ad;
           isAppOpenAdLoaded = true;
         },
-        onAdFailedToLoad: (error) => debugPrint("❌ App Open Ad Failed: $error"),
+        onAdFailedToLoad: (error) => debugPrint(" App Open Ad Failed: $error"),
       ),
     );
   }
@@ -191,7 +181,7 @@ class MyAdController extends GetxController {
       isAppOpenAdLoaded = false;
       loadAppOpenAd();
     } else {
-      debugPrint("⚠️ App Open Ad Not Loaded");
+      debugPrint(" App Open Ad Not Loaded");
     }
   }
 

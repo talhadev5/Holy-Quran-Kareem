@@ -12,15 +12,19 @@ import 'package:quran_kareem/utils/appcolors.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
-  runApp(MyApp());
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.instance.initialize();
 
-  Get.put(MyAdController());
-
+  final MyAdController adController = Get.put(MyAdController());
+  await adController.loadAppOpenAd();
+  runApp(MyApp());
+  // Show app open ad after app starts
+  Future.delayed(Duration(seconds: 3), () {
+    adController.showAppOpenAd();
+  });
   // Change the status bar color
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: AppColors.primary, // Change this to your desired color
+    statusBarColor: AppColors.primary, // Change this   to your desired color
     statusBarIconBrightness: Brightness.light,
   ));
 }

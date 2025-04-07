@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    controller.loadNativeAd();
+    controller.loadBannerAd();
   }
 
   @override
@@ -85,16 +85,22 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        Obx(() => Container(
-              child: controller.isAdLoaded.value
-                  ? ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxHeight: 100,
-                        minHeight: 100,
-                      ),
-                      child: AdWidget(ad: controller.nativeAd!))
-                  : const SizedBox(),
-            )),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: GetBuilder<MyAdController>(
+            builder: (controller) {
+              if (controller.bannerAd != null) {
+                return Container(
+                  color: Colors.white,
+                  width: controller.bannerAd!.size.width.toDouble(),
+                  height: controller.bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: controller.bannerAd!),
+                );
+              }
+              return SizedBox.shrink();
+            },
+          ),
+        ),
       ],
     );
   }
@@ -162,7 +168,7 @@ final List<Map<String, dynamic>> featureItems = [
     "icon": Icons.rate_review_outlined,
     "onTap": () async {
       const url =
-          "https://play.google.com/store/apps/details?id=com.yourapp.qurankareem";
+          "https://play.google.com/store/apps/details?id=mtalhadev5.Holy_Quran_Majeed";
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       } else {
@@ -175,7 +181,7 @@ final List<Map<String, dynamic>> featureItems = [
     "icon": Icons.share,
     "onTap": () {
       Share.share(
-          "Check out this amazing Holy Quran Majeed: https://play.google.com/store/apps/details?id=com.yourapp.qurankareem");
+          "Check out this amazing Holy Quran Majeed: https://play.google.com/store/apps/details?id=mtalhadev5.Holy_Quran_Majeed");
     }
   },
 ];

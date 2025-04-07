@@ -159,16 +159,26 @@ class MyAdController extends GetxController {
   }
 
   // 🔹 Load App Open Ad
-  loadAppOpenAd() {
+
+  loadAppOpenAd({VoidCallback? onAdLoaded}) {
     AppOpenAd.load(
       adUnitId: appOpenAdUnit,
-      request: AdRequest(),
+      request: const AdRequest(),
       adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
           appOpenAd = ad;
           isAppOpenAdLoaded = true;
+          debugPrint(" App Open Ad Loaded");
+
+          // Show ad if callback is provided
+          if (onAdLoaded != null) {
+            onAdLoaded();
+          }
         },
-        onAdFailedToLoad: (error) => debugPrint(" App Open Ad Failed: $error"),
+        onAdFailedToLoad: (error) {
+          debugPrint("Failed to load App Open Ad: $error");
+          isAppOpenAdLoaded = false;
+        },
       ),
     );
   }

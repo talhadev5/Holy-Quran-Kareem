@@ -72,7 +72,7 @@ class _MenuPageState extends State<MenuPage> {
                       // }),
                       _buildMenuItem(Icons.share, "Share App", () {
                         Share.share(
-                            "Check out this amazing Quran Kareem App: https://play.google.com/store/apps/details?id=com.yourapp.qurankareem");
+                            "Check out this amazing Quran Kareem App: https://play.google.com/store/apps/details?id=mtalhadev5.Holy_Quran_Majeed");
                       }),
                     ],
                   ),

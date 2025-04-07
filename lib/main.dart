@@ -17,16 +17,18 @@ void main() async {
 
   final MyAdController adController = Get.put(MyAdController());
   await adController.loadAppOpenAd();
-  runApp(MyApp());
-  // Show app open ad after app starts
-  Future.delayed(Duration(seconds: 3), () {
-    adController.showAppOpenAd();
-  });
-  // Change the status bar color
+    // Change the status bar color
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: AppColors.primary, // Change this   to your desired color
     statusBarIconBrightness: Brightness.light,
   ));
+  runApp(MyApp());
+  // Load and show ad when ready
+  adController.loadAppOpenAd(
+    onAdLoaded: () {
+      adController.showAppOpenAd();
+    },
+  );
 }
 
 class MyApp extends StatelessWidget {
